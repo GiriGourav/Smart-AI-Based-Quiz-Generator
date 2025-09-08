@@ -6,8 +6,12 @@ import com.substring.quiz.dto.QuizDto;
 import com.substring.quiz.repository.QuizRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +24,13 @@ public class QuizServiceImpl implements QuizService{
     private final ModelMapper modelMapper;
     private final RestTemplate restTemplate;
 
-    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, RestTemplate restTemplate) {
+    private final CategoryService categoryService;
+
+    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, RestTemplate restTemplate, CategoryService categoryService) {
         this.quizRepository = quizRepository;
         this.modelMapper = modelMapper;
         this.restTemplate = restTemplate;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -71,6 +78,9 @@ public class QuizServiceImpl implements QuizService{
         logger.info(url);
 //        Call to category Service
         CategoryDto category= restTemplate.getForObject(url, CategoryDto.class);
+        logger.info("Category Exist: {}", category.getTitle());
+        logger.info("Call Completed");
+
         quizDto.setCategoryDto(category);
 
 
@@ -86,7 +96,18 @@ public class QuizServiceImpl implements QuizService{
     @Override
     public List<QuizDto> findAll() {
         List<Quiz> quizzes=quizRepository.findAll();
-        return quizzes.stream().map(quiz->modelMapper.map(quiz,QuizDto.class)).toList();
+
+//        getting category of all quiz
+            List<QuizDto> quizDtos=  quizzes.stream().map(quiz -> {
+            String categoryId=quiz.getCategoryId();
+            QuizDto quizDto = modelMapper.map(quiz, QuizDto.class);
+
+//            call to quiz service using webclient
+               CategoryDto categoryDto= this.categoryService.findById(categoryId);
+               quizDto.setCategoryDto(categoryDto);
+            return quizDto;
+        }).toList();
+        return quizDtos;
     }
 
     @Override
