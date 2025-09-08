@@ -1,22 +1,16 @@
-package com.substring.quiz.collections;
+package com.substring.quiz.dto;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "quizzes")
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Quiz {
+public class QuizDto {
 
-
-    @Id
     private String id;
-    @Field("quiz_title")
     private String title;
     private String description;
     private Integer maxMarks;
@@ -28,5 +22,5 @@ public class Quiz {
     private Integer passingMarks;
     private String categoryId;
 
-
+    private CategoryDto CategoryDto;
 }
