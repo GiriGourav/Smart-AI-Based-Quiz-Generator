@@ -7,10 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.util.UUID;
 
 @SpringBootApplication
+@EnableFeignClients
+
 public class QuizServiceApplication implements CommandLineRunner {
 
     @Autowired
@@ -37,6 +40,8 @@ public class QuizServiceApplication implements CommandLineRunner {
 //
 //        Quiz saved=quizRepository.save(quiz);
 //        System.out.printf("Quiz saved with id: "+savedaved.getId());
+
+
     }
 
 }
