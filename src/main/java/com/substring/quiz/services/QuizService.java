@@ -1,6 +1,5 @@
 package com.substring.quiz.services;
 
-import com.substring.quiz.collections.Quiz;
 import com.substring.quiz.dto.QuizDto;
 import org.springframework.stereotype.Service;
 

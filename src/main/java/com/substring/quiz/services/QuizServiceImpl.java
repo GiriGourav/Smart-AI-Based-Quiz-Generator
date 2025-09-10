@@ -4,17 +4,18 @@ import com.substring.quiz.collections.Quiz;
 import com.substring.quiz.dto.CategoryDto;
 import com.substring.quiz.dto.QuizDto;
 import com.substring.quiz.repository.QuizRepository;
+import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class QuizServiceImpl implements QuizService{
 
@@ -26,18 +27,21 @@ public class QuizServiceImpl implements QuizService{
 
     private final CategoryService categoryService;
 
-    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, RestTemplate restTemplate, CategoryService categoryService) {
+    private final CategoryFeignService categoryFeignService;
+
+    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, RestTemplate restTemplate, CategoryService categoryService, CategoryFeignService categoryFeignService) {
         this.quizRepository = quizRepository;
         this.modelMapper = modelMapper;
         this.restTemplate = restTemplate;
         this.categoryService = categoryService;
+        this.categoryFeignService = categoryFeignService;
     }
 
     @Override
     public QuizDto create(QuizDto quizDto) {
         Quiz quiz=  modelMapper.map(quizDto,Quiz.class);
         quiz.setId(UUID.randomUUID().toString());
-        String url="http://localhost:9093/api/v1/categories/"+quizDto.getCategoryId();
+        String url="http://CATEGORY-SERVICE/api/v1/categories/"+quizDto.getCategoryId();
         logger.info(url);
 //        Call to category Service
         CategoryDto category= restTemplate.getForObject(url, CategoryDto.class);
@@ -45,6 +49,7 @@ public class QuizServiceImpl implements QuizService{
         Quiz savedQuiz= quizRepository.save(quiz);
 
         QuizDto quizDto1=modelMapper.map(savedQuiz,QuizDto.class);
+        quizDto1.setCategoryDto(category);
         return quizDto1;
     }
 
@@ -74,7 +79,7 @@ public class QuizServiceImpl implements QuizService{
 
        QuizDto quizDto= modelMapper.map(quiz,QuizDto.class);
         String categoryId=quiz.getCategoryId();
-        String url="http://localhost:9093/api/v1/categories/"+categoryId;
+        String url="http://CATEGORY-SERVICE/api/v1/categories/"+categoryId;
         logger.info(url);
 //        Call to category Service
         CategoryDto category= restTemplate.getForObject(url, CategoryDto.class);
@@ -99,6 +104,7 @@ public class QuizServiceImpl implements QuizService{
 
 //        getting category of all quiz
             List<QuizDto> quizDtos=  quizzes.stream().map(quiz -> {
+
             String categoryId=quiz.getCategoryId();
             QuizDto quizDto = modelMapper.map(quiz, QuizDto.class);
 
@@ -113,6 +119,22 @@ public class QuizServiceImpl implements QuizService{
     @Override
     public List<QuizDto> findByCategory(String categoryId) {
        List<Quiz> quizzes=quizRepository.findByCategoryId(categoryId);
-        return quizzes.stream().map(quiz->modelMapper.map(quiz,QuizDto.class)).toList();
+        return quizzes.stream().map(quiz->{
+            QuizDto quizDto=modelMapper.map(quiz,QuizDto.class);
+            CategoryDto categoryDto= null;
+
+            try{
+                categoryDto= categoryFeignService.findById(quizDto.getCategoryId());
+            }
+            catch (FeignException.NotFound ex)
+            {
+                logger.error("Category not found");
+            }
+
+            quizDto.setCategoryDto(categoryDto);
+
+            return quizDto;
+        }).toList();
+
     }
 }

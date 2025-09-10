@@ -6,20 +6,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "category-service",url = "http://localhost:9093/api/v1")
+@FeignClient(name = "CATEGORY-SERVICE")
 public interface CategoryFeignService {
-    @GetMapping("/categories")
+    @GetMapping("/api/v1/categories")
     List<CategoryDto> findAll();
 
-    @GetMapping("/categories/{categoryId}")
+    @GetMapping("/api/v1/categories/{categoryId}")
     CategoryDto findById(@PathVariable String categoryId);
 
-    @PostMapping("/categories")
+    @PostMapping("/api/v1/categories")
     CategoryDto create(@RequestBody CategoryDto categoryDto);
 
-    @PutMapping("/categories/{categoryId}")
+    @PutMapping("/api/v1/categories/{categoryId}")
     CategoryDto update(@PathVariable String categoryId, @RequestBody CategoryDto categoryDto);
 
-    @DeleteMapping("/categories/{categoryId}")
+    @DeleteMapping("/api/v1/categories/{categoryId}")
     void delete(@PathVariable String categoryId);
 }

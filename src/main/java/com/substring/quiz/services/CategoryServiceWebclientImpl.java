@@ -19,13 +19,17 @@ public class CategoryServiceWebclientImpl implements CategoryService {
 
     private final WebClient webClient;
 
+    private final WebClient.Builder webClientBuilder;;
+
     private ModelMapper modelMapper;
 
     private final Logger logger= LoggerFactory.getLogger(CategoryServiceWebclientImpl.class);
-    public CategoryServiceWebclientImpl(RestTemplate restTemplate, WebClient webClient, ModelMapper modelMapper) {
+    public CategoryServiceWebclientImpl(RestTemplate restTemplate, WebClient.Builder webClientBuilder, ModelMapper modelMapper) {
         this.restTemplate = restTemplate;
-        this.webClient = webClient;
+        this.webClientBuilder = webClientBuilder;
         this.modelMapper = modelMapper;
+
+        this.webClient=webClientBuilder.baseUrl("/http://CATEGORY-SERVICE").build();
     }
 
     @Override
