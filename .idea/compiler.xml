@@ -10,11 +10,11 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
+        <module name="quiz-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="category-service" target="21" />
-      <module name="quiz-service" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
