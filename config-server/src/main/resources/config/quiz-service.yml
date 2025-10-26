@@ -7,6 +7,7 @@ spring:
 server:
   port: 9092
 
+
 eureka:
   client:
     register-with-eureka: true

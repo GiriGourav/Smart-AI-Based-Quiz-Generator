@@ -41,7 +41,7 @@ public class QuizServiceImpl implements QuizService{
     public QuizDto create(QuizDto quizDto) {
         Quiz quiz=  modelMapper.map(quizDto,Quiz.class);
         quiz.setId(UUID.randomUUID().toString());
-        String url="http://CATEGORY-SERVICE/api/v1/categories/"+quizDto.getCategoryId();
+        String url="lb://CATEGORY-SERVICE/api/v1/categories/"+quizDto.getCategoryId();
         logger.info(url);
 //        Call to category Service
         CategoryDto category= restTemplate.getForObject(url, CategoryDto.class);
@@ -79,7 +79,7 @@ public class QuizServiceImpl implements QuizService{
 
        QuizDto quizDto= modelMapper.map(quiz,QuizDto.class);
         String categoryId=quiz.getCategoryId();
-        String url="http://CATEGORY-SERVICE/api/v1/categories/"+categoryId;
+        String url="lb://CATEGORY-SERVICE/api/v1/categories/"+categoryId;
         logger.info(url);
 //        Call to category Service
         CategoryDto category= restTemplate.getForObject(url, CategoryDto.class);
