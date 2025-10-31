@@ -44,6 +44,7 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDto> getCategory(
             @PathVariable String id
