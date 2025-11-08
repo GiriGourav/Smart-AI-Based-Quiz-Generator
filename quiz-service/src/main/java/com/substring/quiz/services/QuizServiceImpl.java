@@ -8,6 +8,7 @@ import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,12 +30,14 @@ public class QuizServiceImpl implements QuizService{
 
     private final CategoryFeignService categoryFeignService;
 
-    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, RestTemplate restTemplate, CategoryService categoryService, CategoryFeignService categoryFeignService) {
+    private StreamBridge streamBridge;
+    public QuizServiceImpl(QuizRepository quizRepository, ModelMapper modelMapper, RestTemplate restTemplate, CategoryService categoryService, CategoryFeignService categoryFeignService, StreamBridge streamBridge) {
         this.quizRepository = quizRepository;
         this.modelMapper = modelMapper;
         this.restTemplate = restTemplate;
         this.categoryService = categoryService;
         this.categoryFeignService = categoryFeignService;
+        this.streamBridge=streamBridge;
     }
 
     @Override
@@ -50,8 +53,25 @@ public class QuizServiceImpl implements QuizService{
 
         QuizDto quizDto1=modelMapper.map(savedQuiz,QuizDto.class);
         quizDto1.setCategoryDto(category);
+
+        publicQuizCreatedEvent(quizDto1);
+
         return quizDto1;
     }
+
+//    event Publish
+    private void publicQuizCreatedEvent(QuizDto quizDto) {
+         logger.info("Quiz Created, going to Published quizCreatedEvent");
+         var success = this.streamBridge.send("quizCreatedBinding-out-0",quizDto);
+         if(success)
+         {
+             logger.info("Event is sent to broker");
+         }
+         else {
+             logger.info("Failed to send event to broker");
+         }
+    }
+
 
     @Override
     public QuizDto update(String quizId, QuizDto quizDto) {

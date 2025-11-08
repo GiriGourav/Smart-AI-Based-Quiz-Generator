@@ -2,6 +2,17 @@ spring:
   application:
     name: QUIZ-SERVICE
 
+  cloud:
+    function:
+      web:
+        path: "/functions"
+    stream:
+      bindings:
+        quizCreatedBinding-out-0:
+          destination: quiz-created
+          group: ${spring.application.name}
+
+
   profiles:
     active: dev
 
@@ -19,6 +30,7 @@ spring:
     port: 5672
     username: guest
     password: guest
+    connection-timeout: 10s
 
 server:
   port: 9092

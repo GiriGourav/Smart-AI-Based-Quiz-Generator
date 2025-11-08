@@ -14,7 +14,8 @@ public class GatewayConfig {
     {
          return builder.routes()
                  .route("category-service",route->route.path("/category/**")
-                         .filters(f-> f.rewritePath("/category/?(?<remaining>.*)","/${remaining}"))
+                         .filters(f-> f.rewritePath("/category/?(?<remaining>.*)","/${remaining}")
+                                 .circuitBreaker( c->c.setName("categoryCB").setFallbackUri("forward:/categoryFallback")))
                          .uri("lb://CATEGORY-SERVICE"))
                  .route("quiz-service",route->route.path("/quiz/**")
                          .filters(f-> f.rewritePath("/quiz/?(?<remaining>.*)","/${remaining}"))

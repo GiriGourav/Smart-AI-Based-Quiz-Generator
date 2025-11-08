@@ -25,19 +25,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+
         http.cors(Customizer.withDefaults())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchange-> exchange
+                .authorizeExchange(exchange -> exchange
 //                        .pathMatchers("/admin/**").hasRole("ADMIN")
 //                        .pathMatchers("/user/**").hasRole("USER")
-                        .pathMatchers(HttpMethod.GET).hasRole("NORMAL")
-                        .pathMatchers(HttpMethod.POST).hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT).hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.DELETE).hasRole("ADMIN")
-                        .anyExchange()
-                        .authenticated())
+//                        .pathMatchers(HttpMethod.POST, "/category/**").hasAnyRole("NORMAL", "ADMIN")
+//                        .pathMatchers(HttpMethod.GET).hasAnyRole("NORMAL", "ADMIN")
+//                        .pathMatchers(HttpMethod.POST).hasRole("ADMIN")
+//                        .pathMatchers(HttpMethod.PUT).hasRole("ADMIN")
+//                        .pathMatchers(HttpMethod.DELETE).hasRole("ADMIN")
+//                        .anyExchange()
+//                        .authenticated())
+                        .anyExchange().permitAll())
                 .oauth2ResourceServer(
-                        config->config.jwt(jwt->jwt.jwtAuthenticationConverter(roleExtractor())));
+                        config -> config.jwt(jwt -> jwt.jwtAuthenticationConverter(roleExtractor())));
 
         return http.build();
     }
