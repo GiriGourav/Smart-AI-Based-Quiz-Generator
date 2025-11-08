@@ -54,16 +54,17 @@ public class QuizServiceImpl implements QuizService{
         QuizDto quizDto1=modelMapper.map(savedQuiz,QuizDto.class);
         quizDto1.setCategoryDto(category);
 
-        publicQuizCreatedEvent(quizDto1);
+//        Quiz created event ko publish kar diya
+        publishQuizCreatedEvent(quizDto1);
 
         return quizDto1;
     }
 
 //    event Publish
-    private void publicQuizCreatedEvent(QuizDto quizDto) {
+    private void publishQuizCreatedEvent(QuizDto quizDto) {
          logger.info("Quiz Created, going to Published quizCreatedEvent");
-         var success = this.streamBridge.send("quizCreatedBinding-out-0",quizDto);
-         if(success)
+         var status = this.streamBridge.send("quizCreatedBinding-out-0",quizDto);
+         if(status)
          {
              logger.info("Event is sent to broker");
          }
