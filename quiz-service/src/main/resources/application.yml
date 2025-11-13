@@ -9,6 +9,13 @@ spring:
         path: "/functions"
 
     stream:
+      defaultBinder: KafkaBinder
+      binders:
+        KafkaBinder:
+          type: kafka
+      kafka:
+        binder:
+          brokers: localhost:9098
       bindings:
         quizCreatedBinding-out-0:
           destination: quiz-created
@@ -27,15 +34,6 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/quizdb
 
-  #rabbit mq configurations
-
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-    connection-timeout: 10s
-
 server:
   port: 9092
 
@@ -45,5 +43,3 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
-
-
